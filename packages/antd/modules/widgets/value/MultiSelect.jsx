@@ -46,9 +46,28 @@ export default class MultiSelectWidget extends Component {
   }
 
   handleChange = (val) => {
-    if (val && !val.length)
-      val = undefined; //not allow []
-    this.props.setValue(val);
+    if (val && !val.length) {
+      val = undefined //not allow []
+    }
+    //Split on separators, space or comma, if allow custom values
+    let newValues=[];
+    let uniqueValues = {};
+    if (Array.isArray(val) && val.length > 0 && this.props.allowCustomValues) {
+      val.forEach(record => {
+        let values = record.split(/[, ]+/);
+        values.forEach(val => {
+          if (val.length > 0) {
+            if (!(val in uniqueValues)) {
+              uniqueValues[val] = 1;
+              newValues.push(val);
+            }
+          }
+        });
+      });
+      this.props.setValue(newValues);
+    } else {
+      this.props.setValue(val);
+    }
   };
 
   filterOption = (input, option) => {
